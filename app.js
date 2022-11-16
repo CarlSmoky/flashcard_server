@@ -7,6 +7,7 @@ const app = express();
 const db = require('./db');
 const dbHelpers = require('./helpers/dbHelpers')(db);
 
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

@@ -1,7 +1,6 @@
 module.exports = (db) => {
 
   const getCards = () => {
-
     const query = {
       text: `SELECT * FROM cards`
     };
@@ -11,8 +10,6 @@ module.exports = (db) => {
       .then(result => result.rows)
       .catch((err) => err);
   };
-
-  
 
   return {
     getCards,
