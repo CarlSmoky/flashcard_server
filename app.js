@@ -18,10 +18,16 @@ const cardRouter = require('./routes/card');
 
 app.use('/api/card', cardRouter(dbHelpers));
 
-let port = process.env.PORT;
-if (port == null || port == '') {
-  port = 3001;
-}
+// let port = process.env.PORT;
+// if (port == null || port == '') {
+//   port = 8080;
+// }
+
+const port = process.env.PORT || 3001;
+
+app.get('/', (req, res) => {
+  res.send("This is flashcard back-end");
+});
 
 app.listen(port, (req, res) => {
   console.log(`I'm listening ${port}`);
