@@ -75,4 +75,6 @@ typings/
 
 # misc
 .DS_Store
+.dockerignore
+fly.toml
 
