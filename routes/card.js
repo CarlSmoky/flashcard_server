@@ -2,15 +2,27 @@ const express = require('express');
 const router = express.Router();
 
 module.exports = ({
-  getCards
+  getCards,
+  getCardsByDeckID
 }) => {
 
   router.get('/', (req, res) => {
     getCards()
-      .then((library) => {
+      .then((cards) => {
         res
           .status(200)
-          .json(library);
+          .json(cards);
+      })
+      .catch((err) => res.json({
+        error: err.message
+      }));
+  });
+
+  router.get('/deck/:id', (req, res) => {
+    const id = req.params.id;
+    getCardsByDeckID(id)
+      .then((cards) => {
+        res.json(cards);
       })
       .catch((err) => res.json({
         error: err.message
