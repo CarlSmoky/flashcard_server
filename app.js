@@ -15,13 +15,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
 const cardRouter = require('./routes/card');
+const DeckRouter = require('./routes/deck');
+const UserRouter = require('./routes/user');
+const LearningRouter = require('./routes/learning');
 
 app.use('/api/card', cardRouter(dbHelpers));
-
-// let port = process.env.PORT;
-// if (port == null || port == '') {
-//   port = 8080;
-// }
+app.use('/api/deck', DeckRouter(dbHelpers));
+app.use('/api/user', UserRouter(dbHelpers));
+app.use('/api/learning', LearningRouter(dbHelpers));
 
 const port = process.env.PORT || 3001;
 
