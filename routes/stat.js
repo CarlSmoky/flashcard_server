@@ -2,15 +2,15 @@ const express = require('express');
 const router = express.Router();
 
 module.exports = ({
-  getLearnings
+  getStats
 }) => {
 
   router.get('/', (req, res) => {
-    getLearnings()
-      .then((learnings) => {
+    getStats()
+      .then((stats) => {
         res
           .status(200)
-          .json(learnings);
+          .json(stats);
       })
       .catch((err) => res.json({
         error: err.message

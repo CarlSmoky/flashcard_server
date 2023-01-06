@@ -77,9 +77,9 @@ module.exports = (db) => {
   };
 
   // Learnings
-  const getLearnings = () => {
+  const getStats = () => {
     const query = {
-      text: `SELECT * FROM learnings`
+      text: `SELECT * FROM stats`
     };
 
     return db
@@ -95,6 +95,6 @@ module.exports = (db) => {
     getUsers,
     getUserByEmail,
     addUser,
-    getLearnings
+    getStats
   };
 };

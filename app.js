@@ -17,12 +17,12 @@ app.use(cors());
 const cardRouter = require('./routes/card');
 const DeckRouter = require('./routes/deck');
 const UserRouter = require('./routes/user');
-const LearningRouter = require('./routes/learning');
+const StatRouter = require('./routes/stat');
 
 app.use('/api/card', cardRouter(dbHelpers));
 app.use('/api/deck', DeckRouter(dbHelpers));
 app.use('/api/user', UserRouter(dbHelpers));
-app.use('/api/learning', LearningRouter(dbHelpers));
+app.use('/api/stat', StatRouter(dbHelpers));
 
 const port = process.env.PORT || 3001;
 
