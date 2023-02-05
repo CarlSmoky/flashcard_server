@@ -22,7 +22,9 @@ module.exports = ({
     const id = req.params.id;
     getCardsByDeckID(id)
       .then((cards) => {
-        res.json(cards);
+        res
+          .status(200)
+          .json(cards);
       })
       .catch((err) => res.json({
         error: err.message
