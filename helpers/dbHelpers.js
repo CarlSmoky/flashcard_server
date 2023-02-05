@@ -35,6 +35,19 @@ module.exports = (db) => {
       .catch((err) => err);
   };
 
+  const getDeckById = id => {
+    console.log(id)
+    const query = {
+      text: `SELECT * FROM decks WHERE id = $1`,
+      values: [id]
+    };
+
+    return db
+      .query(query)
+      .then(result => result.rows[0])
+      .catch((err) => err);
+  };
+
   // Users
   const getUsers = () => {
     const query = {
@@ -92,6 +105,7 @@ module.exports = (db) => {
     getCards,
     getCardsByDeckID,
     getDecks,
+    getDeckById,
     getUsers,
     getUserByEmail,
     addUser,
