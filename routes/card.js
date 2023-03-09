@@ -3,6 +3,7 @@ const router = express.Router();
 
 module.exports = ({
   getCards,
+  getDeckById,
   getCardsByDeckID
 }) => {
 
@@ -20,11 +21,17 @@ module.exports = ({
 
   router.get('/deck/:id', (req, res) => {
     const id = req.params.id;
-    getCardsByDeckID(id)
-      .then((cards) => {
+    Promise.all([getDeckById(id), getCardsByDeckID(id)])
+      .then((all) => {
+        const deck = all[0];
+        const cards = all[1];
+        const setOfCardsByDeck = {
+          deckName: deck.deck_name,
+          cards
+        }
         res
           .status(200)
-          .json(cards);
+          .json(setOfCardsByDeck);
       })
       .catch((err) => res.json({
         error: err.message
