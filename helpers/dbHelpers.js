@@ -36,7 +36,7 @@ module.exports = (db) => {
   };
 
   const getDeckById = id => {
-    console.log(id)
+    
     const query = {
       text: `SELECT * FROM decks WHERE id = $1`,
       values: [id]
