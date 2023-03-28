@@ -1,3 +1,8 @@
+const {
+  getCreateCardParams,
+  getCreateCardValues
+} = require('./dataHelpers');
+
 module.exports = (db) => {
   //Cards
   const getCards = () => {
@@ -22,6 +27,31 @@ module.exports = (db) => {
       .then((result) => result.rows)
       .catch((err) => err);
   };
+
+  const addCards = async (newCardContents, deckId) => {
+    const columns = ["deck_id", "term", "definition"];
+
+    const params = getCreateCardParams(newCardContents, columns);
+    
+    const values = getCreateCardValues(newCardContents, deckId);
+
+    const createCardsQuery = {
+      text: `INSERT INTO cards (${[...columns]}) VALUES${params} returning *`,
+      values: values
+    };
+      
+    try {
+      const dbResult = await db.query(createCardsQuery);
+      return dbResult.rows;
+    
+    } catch(error) {
+      console.error("The Promise is rejected!", error);
+    } finally {
+      console.log(
+      "The Promise is settled, meaning it has been resolved or rejected."
+    );
+    }
+  }
 
   // Decks
   const getDecks = () => {
@@ -53,10 +83,11 @@ module.exports = (db) => {
       text: `INSERT INTO decks (deck_name, description, user_id) VALUES($1, $2, $3) returning *`,
       values: [deckName, description, userId]
     };
+    
     try {
     const dbResult = await db.query(deckQuery);
-    const deckId = dbResult.rows[0].id;
-    return deckId;
+    const deck = dbResult.rows[0];
+    return deck;
   
     } catch(error) {
       console.error("The Promise is rejected!", error);
@@ -123,6 +154,7 @@ module.exports = (db) => {
   return {
     getCards,
     getCardsByDeckID,
+    addCards,
     getDecks,
     getDeckById,
     getUsers,

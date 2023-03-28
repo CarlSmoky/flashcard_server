@@ -3,6 +3,8 @@ const router = express.Router();
 
 module.exports = ({
   getDecks,
+  addDeck,
+  addCards
 }) => {
 
   router.get('/', (req, res) => {
@@ -19,15 +21,19 @@ module.exports = ({
 
   router.post('/create/', async (req, res) => {
     const { newDeckContents, newCardContents } = req.body;
-  
+    const tempUserId = 1;
     try {
-      let id = await addDeck(newDeckContents.deckName, newDeckContents.description, 1);
-      console.log("id",id);
+      const deckResult = await addDeck(newDeckContents.deckName, newDeckContents.description, tempUserId);
       
-      // let something = await addCards(newCardContents);
+      const cardsResult = await addCards(newCardContents, deckResult.id);
+      const numOfData = cardsResult.length;
+      
       res
         .status(200)
-        .json(id);
+        .json({
+          deckName: deckResult.deck_name,
+          numOfCards: numOfData
+        });
     } catch(err) {
       res.json({
         error: err.message
