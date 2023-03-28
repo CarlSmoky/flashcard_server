@@ -48,6 +48,25 @@ module.exports = (db) => {
       .catch((err) => err);
   };
 
+  const addDeck = async (deckName, description, userId) => {
+    const deckQuery = {
+      text: `INSERT INTO decks (deck_name, description, user_id) VALUES($1, $2, $3) returning *`,
+      values: [deckName, description, userId]
+    };
+    try {
+    const dbResult = await db.query(deckQuery);
+    const deckId = dbResult.rows[0].id;
+    return deckId;
+  
+    } catch(error) {
+      console.error("The Promise is rejected!", error);
+    } finally {
+    console.log(
+    "The Promise is settled, meaning it has been resolved or rejected."
+    );
+    }
+  }
+
   // Users
   const getUsers = () => {
     const query = {
@@ -109,6 +128,7 @@ module.exports = (db) => {
     getUsers,
     getUserByEmail,
     addUser,
-    getStats
+    getStats,
+    addDeck
   };
 };
