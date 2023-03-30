@@ -85,16 +85,15 @@ module.exports = (db) => {
     };
     
     try {
-    const dbResult = await db.query(deckQuery);
-    const deck = dbResult.rows[0];
-    return deck;
-  
+      const dbResult = await db.query(deckQuery);
+      const deck = dbResult.rows[0];
+      return deck;
     } catch(error) {
-      console.error("The Promise is rejected!", error);
+        console.error("The Promise is rejected!", error);
     } finally {
-    console.log(
-    "The Promise is settled, meaning it has been resolved or rejected."
-    );
+        console.log(
+        "The Promise is settled, meaning it has been resolved or rejected."
+        );
     }
   }
 

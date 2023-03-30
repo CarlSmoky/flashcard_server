@@ -24,7 +24,9 @@ module.exports = ({
     const tempUserId = 1;
     try {
       const deckResult = await addDeck(newDeckContents.deckName, newDeckContents.description, tempUserId);
-      
+      if (!deckResult) {
+        throw new Error(`This title already exists.`);
+      }
       const cardsResult = await addCards(newCardContents, deckResult.id);
       const numOfData = cardsResult.length;
       
@@ -35,9 +37,11 @@ module.exports = ({
           numOfCards: numOfData
         });
     } catch(err) {
-      res.json({
+      res
+        .status(409)
+        .json({
         error: err.message
-      })
+        })
     }
   });
 
