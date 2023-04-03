@@ -7,16 +7,19 @@ module.exports = ({
   addCards
 }) => {
 
-  router.get('/', (req, res) => {
-    getDecks()
-      .then((decks) => {
-        res
-          .status(200)
-          .json(decks);
-      })
-      .catch((err) => res.json({
+  router.get('/', async (req, res) => {
+    try {
+      const decks = await getDecks();
+      res
+        .status(200)
+        .json(decks);
+    } catch(err) {
+      res
+        .status(409)
+        .json({
         error: err.message
-      }));
+        })
+    }
   });
 
   router.post('/create/', async (req, res) => {
