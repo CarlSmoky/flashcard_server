@@ -36,6 +36,7 @@ module.exports = ({
       res
         .status(200)
         .json({
+          deckId : deckResult.id,
           deckName: deckResult.deck_name,
           numOfCards: numOfData
         });
