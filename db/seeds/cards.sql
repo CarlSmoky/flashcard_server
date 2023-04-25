@@ -40,7 +40,7 @@ VALUES
 (1,'fêter', 'to celebrate'),
 (1,'être agacé','to be annoyed'),
 (1,'le voisinage','the neighbourhood'),
-(1,'moche','ugy'),
+(1,'moche','ugly'),
 (1,'être doué pour','be good at'),
 (1,'les enceintes','the speakers'),
 (1,'propre','clean'),
@@ -139,4 +139,7 @@ VALUES
 (1,'Être fier','to be proud'),
 (1,'revoir quelqu’un','to see someone again'),
 (1,'le centre-ville','downtown'),
-(2, 'What is Callback hell?', 'A situation where you have multiple asynchronous functions. Those functions depends on another, so it could get quite messy');
+(2, 'What is Callback hell?', 'A situation where you have multiple asynchronous functions. Those functions depends on another, so it could get quite messy'),
+(2, 'What is the DOM?', 'It represents the page so that programs can change the document structure, style, and content. The DOM represents the document as nodes and objects; that way, programming languages can interact with the page.'),
+(2, 'What is the virtual DOM in React?', 'The virtual DOM provides a mechanism that abstracts manual DOM manipulations away from the developer, helping us to write more predictable code.')
+;

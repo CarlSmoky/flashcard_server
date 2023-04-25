@@ -42,6 +42,7 @@ module.exports = (db) => {
       
     try {
       const dbResult = await db.query(createCardsQuery);
+      console.log(dbResult);
       return dbResult.rows;
     
     } catch(error) {
