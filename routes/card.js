@@ -30,7 +30,7 @@ module.exports = ({
       const deck = all[0];
       const cards = all[1];
       const setOfCardsByDeck = {
-        deckName: deck.deck_name,
+        deck,
         cards
       }
       res
