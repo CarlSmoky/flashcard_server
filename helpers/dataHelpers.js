@@ -30,7 +30,58 @@ const getCreateCardValues = (newCardContents, deckId) => {
   return result;
 }
 
+//Helpers
+const getUpdateCardsValues = (updateCardsData) => {
+  let values = [];
+  updateCardsData.forEach(card => {
+    values = [...values, card.id, card.term, card.definition];
+  })
+  return values;
+}
+
+const getIds =  (updateCardsData) => { 
+  return updateCardsData.map ((_, index) => {
+    return `$${(index * 3) + 1}` 
+  })
+}
+
+const formatQueryParams = (index, columnName) => {
+  const newIndex = (index * 3) + 1
+  let columnIndex;
+
+  if (columnName === 'term') {
+    columnIndex = newIndex + 1
+  }
+  if (columnName === 'definition') {
+    columnIndex = newIndex + 2
+  }
+  return `WHEN id = $${newIndex} THEN $${columnIndex} `
+}
+
+const generateUpdateCardsQuery = (updateCardsData) => {
+  const ids = getIds(updateCardsData);
+
+  let query = 'UPDATE cards SET term = CASE ';
+  updateCardsData.forEach((_, index) => {
+    const queryString = formatQueryParams(index, 'term');
+    query += queryString;
+  })
+
+  query += `ELSE term END, definition = CASE `;
+
+  updateCardsData.forEach((_, index) => {
+    const queryString = formatQueryParams(index,'definition');
+    query += queryString;
+  })
+  query += `ELSE definition END `;
+  query += `WHERE id IN (${ids}) returning *;`;
+  
+  return query;
+}
+
 module.exports = {
   getCreateCardParams,
-  getCreateCardValues
+  getCreateCardValues,
+  generateUpdateCardsQuery,
+  getUpdateCardsValues
 };
