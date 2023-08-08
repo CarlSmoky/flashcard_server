@@ -1,6 +1,8 @@
 const {
   getCreateCardParams,
-  getCreateCardValues
+  getCreateCardValues,
+  generateUpdateCardsQuery,
+  getUpdateCardsValues
 } = require('./dataHelpers');
 
 module.exports = (db) => {
@@ -30,28 +32,40 @@ module.exports = (db) => {
 
   const addCards = async (newCardContents, deckId) => {
     const columns = ["deck_id", "term", "definition"];
-
     const params = getCreateCardParams(newCardContents, columns);
-    
     const values = getCreateCardValues(newCardContents, deckId);
 
     const createCardsQuery = {
       text: `INSERT INTO cards (${[...columns]}) VALUES${params} returning *`,
       values: values
     };
-      
-    try {
-      const dbResult = await db.query(createCardsQuery);
-      console.log(dbResult);
-      return dbResult.rows;
-    
-    } catch(error) {
-      console.error("The Promise is rejected!", error);
-    } finally {
-      console.log(
-      "The Promise is settled, meaning it has been resolved or rejected."
-    );
-    }
+
+    const dbResult = await db.query(createCardsQuery);
+    return dbResult.rows;
+  }
+
+  const updateCards = async (updateCardContents) => {
+    const query = generateUpdateCardsQuery(updateCardContents);
+
+    const values = getUpdateCardsValues(updateCardContents);
+
+    const updateCardsQuery = {
+      text: query,
+      values: values
+    };
+
+    const dbResult = await db.query(updateCardsQuery);
+    return dbResult.rows;
+  }
+
+  const deleteCards = async (deleteCardsData) => {
+    const ids = deleteCardsData.map(card => {
+      return card.id
+    })
+    const deleteCardsQuery = `DELETE FROM cards WHERE id IN (${[...ids]}) returning *`
+
+    const dbResult = await db.query(deleteCardsQuery);
+    return dbResult.rows;
   }
 
   // Decks
@@ -67,7 +81,7 @@ module.exports = (db) => {
   };
 
   const getDeckById = id => {
-    
+
     const query = {
       text: `SELECT * FROM decks WHERE id = $1`,
       values: [id]
@@ -84,18 +98,26 @@ module.exports = (db) => {
       text: `INSERT INTO decks (deck_name, description, user_id) VALUES($1, $2, $3) returning *`,
       values: [deckName, description, userId]
     };
-    
+
     try {
       const dbResult = await db.query(deckQuery);
       const deck = dbResult.rows[0];
       return deck;
-    } catch(error) {
-        console.error("The Promise is rejected!", error);
-    } finally {
-        console.log(
-        "The Promise is settled, meaning it has been resolved or rejected."
-        );
+    } catch (error) {
+      console.error("Failed to add deck!", error);
     }
+  }
+
+
+  const updateDeck = async (id, deckName, description) => {
+    const updateDeckQuery = {
+      text: `UPDATE decks SET deck_name = $2, description = $3 WHERE id = $1 returning *`,
+      values: [id, deckName, description]
+    };
+
+    const dbResult = await db.query(updateDeckQuery);
+    const deck = dbResult.rows[0];
+    return deck;
   }
 
   // Users
@@ -155,12 +177,15 @@ module.exports = (db) => {
     getCards,
     getCardsByDeckID,
     addCards,
+    updateCards,
+    deleteCards,
     getDecks,
     getDeckById,
     getUsers,
     getUserByEmail,
     addUser,
     getStats,
-    addDeck
+    addDeck,
+    updateDeck
   };
 };
