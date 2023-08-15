@@ -82,12 +82,12 @@ module.exports = ({
       }
       if (updateCardsResult) {
         results = {...results,
-         numOfupdatedCard: updateCardsResult.length
+         numOfUpdatedCard: updateCardsResult.length
          }
        }
        if (createdCardsResult) {
         results = {...results,
-         numOfcreatedCard: createdCardsResult.length
+         numOfCreatedCard: createdCardsResult.length
          }
        }
        if (deleteCardsResult) {
