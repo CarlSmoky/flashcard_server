@@ -95,7 +95,6 @@ module.exports = ({
          numOfDeletedCards: deleteCardsResult.length
          }
        }
-      console.log(results)
       
       res
         .status(200)
@@ -103,7 +102,6 @@ module.exports = ({
           results
         );
     } catch(err) {
-      console.log("Error in Post----!")
       console.log(err)
       res
         .status(409)
