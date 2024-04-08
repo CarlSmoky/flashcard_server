@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const {
+  validateAccessToken,
+} = require("../middleware/auth0.middleware.js");
 
 module.exports = ({
   getDecks,

@@ -21,6 +21,10 @@ const DeckRouter = require('./routes/deck');
 const UserRouter = require('./routes/user');
 const StatRouter = require('./routes/stat');
 
+const {
+  validateAccessToken,
+} = require("./middleware/auth0.middleware.js");
+
 app.use('/api/card', cardRouter(dbHelpers));
 app.use('/api/deck', DeckRouter(dbHelpers));
 app.use('/api/user', UserRouter(dbHelpers));
@@ -32,8 +36,15 @@ app.get('/', (req, res) => {
   res.send("This is flashcard back-end");
 });
 
+
+app.get("/api/protected", validateAccessToken, (req, res) => {
+  console.log("here on backend")
+  res.status(200).json({"hi": "message"});
+});
+
 app.listen(port, (req, res) => {
   console.log(`I'm listening ${port}`);
 })
+
 
 module.exports = app;
