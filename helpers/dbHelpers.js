@@ -120,6 +120,19 @@ module.exports = (db) => {
     return deck;
   }
 
+  // Auth0
+  const getOwerOfDeck = (id) => {
+    const query = {
+      text: `SELECT user_id FROM decks WHERE id = $1`,
+      values: [id]
+    };
+
+    return db
+      .query(query)
+      .then(result => result.rows[0])
+      .catch((err) => err);
+  };
+
   // Users
   const getUsers = () => {
     const query = {
@@ -186,6 +199,7 @@ module.exports = (db) => {
     addUser,
     getStats,
     addDeck,
-    updateDeck
+    updateDeck,
+    getOwerOfDeck
   };
 };
