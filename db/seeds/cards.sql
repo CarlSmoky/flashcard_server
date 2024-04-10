@@ -142,12 +142,11 @@ VALUES
 (2, 'What is Callback hell?', 'A situation where you have multiple asynchronous functions. Those functions depends on another, so it could get quite messy'),
 (2, 'What is the DOM?', 'It represents the page so that programs can change the document structure, style, and content. The DOM represents the document as nodes and objects; that way, programming languages can interact with the page.'),
 (2, 'What is the virtual DOM in React?', 'The virtual DOM provides a mechanism that abstracts manual DOM manipulations away from the developer, helping us to write more predictable code.'),
-cards(deck_id, term, definition)
 (1, 'un pourboire', 'a tip'),
 (1,' tais-toi', 'be quiet'),
 (1,'l’eau pétillante', 'sparkling water'),
 (1,'cru', 'raw'),
-(1,' pourtant', 'yet [connective]')
+(1,' pourtant', 'yet [connective]'),
 (1,'mec', 'a guy'),
 (1,'le quai', 'the platform'),
 (1,'le moyen', 'the average'),
@@ -163,7 +162,7 @@ cards(deck_id, term, definition)
 (1,'un but', 'an objective '),
 (1,'la foule', 'the crowd '),
 (1,'une crevette', 'a shrimp'),
-(1,'la moitié', 'half')
+(1,'la moitié', 'half'),
 (1,'entière', 'whole'),
 (1,'La canette', 'the can'),
 (1,'un loisir', 'a hobby'), 
@@ -273,7 +272,6 @@ cards(deck_id, term, definition)
 (1,'une manche ', 'sleeve'),
 (1,'fourrure', 'fur'),
 (1,'soie ', 'silk'),
-VALUES
 (1,'le col', 'the collar'),
 (1,'a l’envers', 'backwards'),
 (1,'un trou ', 'a hole'),
