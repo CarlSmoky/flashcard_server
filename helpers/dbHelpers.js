@@ -68,6 +68,21 @@ module.exports = (db) => {
     return dbResult.rows;
   }
 
+  const deleteAllCardsByDeckId= async (id) => {
+    if (!id) {
+      throw new Error(`deck_id is missing.`);
+    }
+    const query = {
+      text: `DELETE FROM cards WHERE deck_id = $1 returning *`,
+      values: [id]
+    };
+
+    return db
+      .query(query)
+      .then(result => result.rows)
+      .catch((err) => err);
+  }
+
   // Decks
   const getDecks = () => {
     const query = {
@@ -118,6 +133,21 @@ module.exports = (db) => {
     const dbResult = await db.query(updateDeckQuery);
     const deck = dbResult.rows[0];
     return deck;
+  }
+
+  const deleteDeck= async (id) => {
+    if (!id) {
+      throw new Error(`deck_id is missing.`);
+    }
+    const query = {
+      text: `DELETE FROM decks WHERE id = $1 returning *`,
+      values: [id]
+    };
+
+    return db
+      .query(query)
+      .then(result => result.rows[0])
+      .catch((err) => err);
   }
 
   // Auth0
@@ -192,8 +222,10 @@ module.exports = (db) => {
     addCards,
     updateCards,
     deleteCards,
+    deleteAllCardsByDeckId,
     getDecks,
     getDeckById,
+    deleteDeck,
     getUsers,
     getUserByEmail,
     addUser,
