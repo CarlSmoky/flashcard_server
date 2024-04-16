@@ -1,6 +1,6 @@
 const {
-  getCreateCardParams,
-  getCreateCardValues,
+  generateParams,
+  generateValues,
   generateUpdateCardsQuery,
   getUpdateCardsValues
 } = require('./dataHelpers');
@@ -32,8 +32,8 @@ module.exports = (db) => {
 
   const addCards = async (newCardContents, deckId) => {
     const columns = ["deck_id", "term", "definition"];
-    const params = getCreateCardParams(newCardContents, columns);
-    const values = getCreateCardValues(newCardContents, deckId);
+    const params = generateParams(newCardContents, columns);
+    const values = generateValues(newCardContents, deckId);
 
     const createCardsQuery = {
       text: `INSERT INTO cards (${[...columns]}) VALUES${params} returning *`,
@@ -46,7 +46,6 @@ module.exports = (db) => {
 
   const updateCards = async (updateCardContents) => {
     const query = generateUpdateCardsQuery(updateCardContents);
-
     const values = getUpdateCardsValues(updateCardContents);
 
     const updateCardsQuery = {
@@ -216,6 +215,25 @@ module.exports = (db) => {
       .catch((err) => err);
   };
 
+  const addStats = async (stats, userId) => {
+    const columns = ["user_id", "card_id", "learning", "star"];
+    const params = generateParams(stats, columns);
+    const values = generateValues(stats, userId);
+    
+    const query = {
+      text: `INSERT INTO stats (${[...columns]}) VALUES${params} returning *`,
+      values: values
+    };
+
+    try {
+      const dbResult = await db.query(query);
+      const numOfUpdatedItem = dbResult.rows.length;
+      return numOfUpdatedItem;
+    } catch (error) {
+      console.error("Failed to add to stats!", error);
+    }
+  };
+
   return {
     getCards,
     getCardsByDeckID,
@@ -230,6 +248,7 @@ module.exports = (db) => {
     getUserByEmail,
     addUser,
     getStats,
+    addStats,
     addDeck,
     updateDeck,
     getOwerOfDeck

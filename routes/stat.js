@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const {
+  validateAccessToken,
+} = require("../middleware/auth0.middleware.js");
 
 module.exports = ({
-  getStats
+  getStats,
+  addStats
 }) => {
 
   router.get('/', (req, res) => {
@@ -17,5 +21,25 @@ module.exports = ({
       }));
   });
 
+  router.post('/', validateAccessToken, async (req, res) => {
+    const { stats } = req.body;
+    const userId = req.auth.payload.sub;
+    try {
+      const result = await addStats(stats, userId);
+
+      res
+        .status(200)
+        .json({
+          res: result
+        });
+    } catch (err) {
+      res
+        .status(409)
+        .json({
+          error: err.message
+        })
+    }
+  });
+
   return router;
-};
+}

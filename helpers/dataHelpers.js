@@ -1,4 +1,4 @@
-const getCreateCardParams = (newCardContents, columns) => {
+const generateParams = (newCardContents, columns) => {
   let result = '';
   let i = 0;
     while (i < newCardContents.length * columns.length) {
@@ -18,7 +18,7 @@ const getCreateCardParams = (newCardContents, columns) => {
   return result;
 }
 
-const getCreateCardValues = (newCardContents, deckId) => {
+const generateValues = (newCardContents, deckId) => {
   let result = [];
   newCardContents.forEach((element, index) => {
     result = [...result, deckId];
@@ -80,8 +80,8 @@ const generateUpdateCardsQuery = (updateCardsData) => {
 }
 
 module.exports = {
-  getCreateCardParams,
-  getCreateCardValues,
+  generateParams,
+  generateValues,
   generateUpdateCardsQuery,
   getUpdateCardsValues
 };
