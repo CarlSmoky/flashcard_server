@@ -13,7 +13,7 @@ module.exports = ({
   deleteAllCardsByDeckId,
   updateDeck,
   deleteDeck,
-  getOwerOfDeck
+  getOwerOfDeckId
 }) => {
 
   router.get('/', async (req, res) => {
@@ -64,7 +64,7 @@ module.exports = ({
     const { updateDeckData, createdCardsData, updateCardsData, deleteCardsData } = req.body;
     
     try {
-      const userId = await getOwerOfDeck(deckId);
+      const userId = await getOwerOfDeckId(deckId);
       if (auth0UserId !== userId.user_id) {
         throw new Error(`User doesn't match. Only deck owner can change their decks and cards.`);
       }
@@ -115,7 +115,8 @@ module.exports = ({
     } catch(err) {
       console.log(err)
       res
-        .status(409)
+      // Status code need to be evaluate.
+        .status(403)
         .json({
         error: err.message
         })

@@ -25,12 +25,11 @@ module.exports = ({
     const { stats } = req.body;
     const userId = req.auth.payload.sub;
     try {
-      const result = await addStats(stats, userId);
-
+      const numOfItem = await addStats(stats, userId);
       res
         .status(200)
         .json({
-          res: result
+          numOfItem
         });
     } catch (err) {
       res
