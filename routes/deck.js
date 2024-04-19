@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const {
+  validateAccessToken,
+} = require("../middleware/auth0.middleware.js");
 
 module.exports = ({
   getDecks,
@@ -7,7 +10,10 @@ module.exports = ({
   addCards,
   updateCards,
   deleteCards,
-  updateDeck
+  deleteAllCardsByDeckId,
+  updateDeck,
+  deleteDeck,
+  getOwerOfDeckId
 }) => {
 
   router.get('/', async (req, res) => {
@@ -25,11 +31,11 @@ module.exports = ({
     }
   });
 
-  router.post('/create/', async (req, res) => {
+  router.post('/create/', validateAccessToken, async (req, res) => {
     const { newDeckContents, newCardContents } = req.body;
-    const tempUserId = 1;
+    const userId = req.auth.payload.sub;
     try {
-      const deckResult = await addDeck(newDeckContents.deckName, newDeckContents.description, tempUserId);
+      const deckResult = await addDeck(newDeckContents.deckName, newDeckContents.description, userId);
       if (!deckResult) {
         throw new Error(`This title already exists.`);
       }
@@ -52,11 +58,16 @@ module.exports = ({
     }
   });
 
-  router.post('/update/:id', async (req, res) => {
+  router.post('/update/:id', validateAccessToken, async (req, res) => {
     const deckId = req.params.id;
+    const auth0UserId = req.auth.payload.sub;
     const { updateDeckData, createdCardsData, updateCardsData, deleteCardsData } = req.body;
     
     try {
+      const userId = await getOwerOfDeckId(deckId);
+      if (auth0UserId !== userId.user_id) {
+        throw new Error(`User doesn't match. Only deck owner can change their decks and cards.`);
+      }
       let deckResult;
       if (updateDeckData !== null) {
         deckResult = await updateDeck(updateDeckData.id, updateDeckData.deckName, updateDeckData.description);
@@ -96,6 +107,26 @@ module.exports = ({
          }
        }
       
+      res
+        .status(200)
+        .json(
+          results
+        );
+    } catch(err) {
+      console.log(err)
+      res
+      // Status code need to be evaluate.
+        .status(403)
+        .json({
+        error: err.message
+        })
+    }
+  });
+
+  router.post('/delete/:id', validateAccessToken, async (req, res) => {
+    const deckId = req.params.id;
+    try {
+      const results = await Promise.all([deleteDeck(deckId), deleteAllCardsByDeckId(deckId)]);
       res
         .status(200)
         .json(

@@ -1,5 +1,5 @@
 INSERT INTO
 decks(deck_name, user_id)
 VALUES
-    ('French Vocab', 1),
-    ('JavaScript', 1);
+    ('french vocab', 'google-oauth2|106300183356913876111'),
+    ('javaScript', 'google-oauth2|106300183356913876111');
