@@ -8,7 +8,7 @@ module.exports = (db) => {
       const result = await db.query(query);
       return result.rows;
     } catch(error) {
-      console.log(error)
+      console.error("Failed to get cards!", error);
     }
   };
 
@@ -18,7 +18,7 @@ module.exports = (db) => {
       const result = await db.query(query);
       return result.rows;
     } catch(error) {
-      console.log(error)
+      console.error("Failed to get cards by deck_id!", error);
     }
   };
 
@@ -27,9 +27,18 @@ module.exports = (db) => {
     try {
       const query = query_strings.ADD_CARDS(columns, newCardContents, deckId);
       const result = await db.query(query);
-      return result.rows;
+      
+      return {
+        data : result.rows,
+        error: null
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Failed to add cards!", error);
+
+      return {
+        data: null,
+        error, 
+      };
     }
   }
 
@@ -38,9 +47,18 @@ module.exports = (db) => {
     try {
       const query = query_strings.UPDATE_CARDS(updateCardContents);
       const result = await db.query(query);
-      return result.rows;
+      
+      return {
+        data : result.rows,
+        error: null
+      }
     } catch (error) {
-      console.log(error);
+      console.log("Failed to update cards!", error);
+      
+      return {
+        data: null,
+        error, 
+      };
     }
   }
 
@@ -49,9 +67,17 @@ module.exports = (db) => {
     try {
       const query = query_strings.DELETE_CARDS(ids);
       const result = await db.query(query);
-      return result.rows;
+      return {
+        data : result.rows,
+        error: null
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Failed to delete cards!", error);
+
+      return {
+        data: null,
+        error, 
+      };
     }
   }
 
@@ -64,7 +90,7 @@ module.exports = (db) => {
       const result = await db.query(query);
       return result.rows;
     } catch (error) {
-      console.log(error);
+      console.error("Failed to delete all cards by deck_id!", error);
     }
   }
 
@@ -76,7 +102,7 @@ module.exports = (db) => {
       const result = await db.query(query);
       return result.rows;
     } catch (error) {
-      console.log(error);
+      console.error("Failed to get decks!", error);
     }
   };
 
@@ -87,7 +113,7 @@ module.exports = (db) => {
       const result = await db.query(query);
       return result.rows[0];
     } catch (error) {
-      console.log(error);
+      console.error("Failed to get deck_id!", error);
     }
   };
 
@@ -108,9 +134,18 @@ module.exports = (db) => {
     try {
       const query = query_strings.UPDATE_DECK(id, deckName, description) ;
       const result = await db.query(query);
-      return result.rows[0];
+
+      return {
+        data : result.rows[0],
+        error: null
+      }
     } catch (error) {
       console.error("Failed to update deck!", error);
+
+      return {
+        data: null,
+        error, 
+      };
     }
   }
 

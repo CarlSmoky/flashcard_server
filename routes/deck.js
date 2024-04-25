@@ -39,8 +39,15 @@ module.exports = ({
       if (!deckResult) {
         throw new Error(`This title already exists.`);
       }
-      const cardsResult = await addCards(newCardContents, deckResult.id);
-      const numOfData = cardsResult.length;
+      const {data, error} = await addCards(newCardContents, deckResult.id);
+      let numOfData = []
+      if (data) {
+        numOfData = data.length;
+      }
+
+      if(error) {
+        throw new Error("Failed to add cards!");
+      }
       
       res
         .status(200)
@@ -53,7 +60,7 @@ module.exports = ({
       res
         .status(409)
         .json({
-        error: err.message
+          error: err.message
         })
     }
   });
@@ -68,57 +75,58 @@ module.exports = ({
       if (auth0UserId !== userId.user_id) {
         throw new Error(`User doesn't match. Only deck owner can change their decks and cards.`);
       }
-      let deckResult;
+
+      let promiseArr = [];
+      let targetFunctions = [];
       if (updateDeckData !== null) {
-        deckResult = await updateDeck(updateDeckData.id, updateDeckData.deckName, updateDeckData.description);
+        promiseArr = [...promiseArr, updateDeck(updateDeckData.id, updateDeckData.deckName, updateDeckData.description)];
+        targetFunctions = [...targetFunctions, "updateDeck"];
       }
-      let updateCardsResult;
+
       if (updateCardsData.length !== 0) {
-        updateCardsResult = await updateCards(updateCardsData);
+        promiseArr = [...promiseArr, updateCards(updateCardsData)];
+        targetFunctions = [...targetFunctions, "updateCards"];
       }
-      let createdCardsResult;
+
       if (createdCardsData.length !== 0) {
-        createdCardsResult = await addCards(createdCardsData, deckId);
+        promiseArr = [...promiseArr, addCards(createdCardsData, deckId)];
+        targetFunctions = [...targetFunctions, "addCards"];
       }
-      let deleteCardsResult;
+
       if (deleteCardsData.length !== 0) {
-        deleteCardsResult = await deleteCards(deleteCardsData);
+        promiseArr = [...promiseArr, deleteCards(deleteCardsData)];
+        targetFunctions = [...targetFunctions, "deleteCards"];
       }
-      let results = {};
-      if (deckResult) {
-       results = {...results,
-        updateDeckName: deckResult.deck_name,
-        updateDescription: deckResult.description
-        }
+
+      const results = await Promise.all(promiseArr);
+
+      const getErrorOccuredFunctions = results => {
+        let functions = [];
+        results.forEach(({data, error}, i) => {
+          if (!!error) {
+            functions = [...functions, targetFunctions[i]];
+          }
+        })
+        return functions;
       }
-      if (updateCardsResult) {
-        results = {...results,
-         numOfUpdatedCard: updateCardsResult.length
-         }
-       }
-       if (createdCardsResult) {
-        results = {...results,
-         numOfCreatedCard: createdCardsResult.length
-         }
-       }
-       if (deleteCardsResult) {
-        results = {...results,
-         numOfDeletedCards: deleteCardsResult.length
-         }
-       }
-      
+
+      const errorItem = getErrorOccuredFunctions(results);
+      if(errorItem.length > 0) {
+        // Need to add roleback
+        throw new Error(`Error occurs in: ${[...errorItem]}` );
+      }
+
       res
         .status(200)
         .json(
           results
         );
     } catch(err) {
-      console.log(err)
       res
       // Status code need to be evaluate.
         .status(403)
         .json({
-        error: err.message
+          error: err.message
         })
     }
   });
@@ -127,6 +135,7 @@ module.exports = ({
     const deckId = req.params.id;
     try {
       const results = await Promise.all([deleteDeck(deckId), deleteAllCardsByDeckId(deckId)]);
+      
       res
         .status(200)
         .json(
@@ -134,6 +143,7 @@ module.exports = ({
         );
     } catch(err) {
       console.log(err)
+      
       res
         .status(409)
         .json({
