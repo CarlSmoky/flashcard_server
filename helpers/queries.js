@@ -5,7 +5,7 @@ const {
   getUpdateCardsValues
 } = require('./dataHelpers');
 
-query_strings = {
+queryStrings = {
   "GET_CARDS_BY_DECKID" : (id) => {
     return  {
       text: `SELECT * FROM cards WHERE deck_id = $1`,
@@ -77,5 +77,5 @@ query_strings = {
   }
 }
 module.exports = {
-  query_strings
+  queryStrings
 }
