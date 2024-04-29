@@ -111,9 +111,18 @@ module.exports = (db) => {
     try {
       const query = queryStrings.GET_DECKS;
       const result = await db.query(query);
-      return result.rows;
+
+      return {
+        data : result.rows,
+        error: null
+      }
     } catch (error) {
       console.error("Failed to get decks!", error);
+
+      return {
+        data: null,
+        error, 
+      };
     }
   };
 
@@ -142,9 +151,18 @@ module.exports = (db) => {
     try {
       const query = queryStrings.ADD_DECK(deckName, description, userId) ;
       const result = await db.query(query);
-      return result.rows[0];
+
+      return {
+        data : result.rows[0],
+        error: null
+      }
     } catch (error) {
       console.error("Failed to add deck!", error);
+
+      return {
+        data: null,
+        error, 
+      };
     }
   }
 

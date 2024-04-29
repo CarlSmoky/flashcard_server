@@ -17,16 +17,22 @@ module.exports = ({
 }) => {
 
   router.get('/', async (req, res) => {
+    
     try {
-      const decks = await getDecks();
+      const { data, error } = await getDecks();
+
+      if (error) {
+        throw new Error(`Failed to get deck list.` );
+      }
+
       res
         .status(200)
-        .json(decks);
+        .json(data);
     } catch(err) {
       res
-        .status(409)
+        .status(400)
         .json({
-        error: err.message
+          error: err.message
         })
     }
   });
@@ -35,30 +41,40 @@ module.exports = ({
     const { newDeckContents, newCardContents } = req.body;
     const userId = req.auth.payload.sub;
     try {
-      const deckResult = await addDeck(newDeckContents.deckName, newDeckContents.description, userId);
-      if (!deckResult) {
-        throw new Error(`This title already exists.`);
-      }
-      const {data, error} = await addCards(newCardContents, deckResult.id);
-      let numOfData = []
-      if (data) {
-        numOfData = data.length;
+
+      let statusCode = 200;
+      const results = {};
+      const { data, error } = await addDeck(newDeckContents.deckName, newDeckContents.description, userId);
+    
+      if (error) {
+        throw new Error(`Failed to create deck! error: ${error}`);
       }
 
-      if(error) {
-        throw new Error("Failed to add cards!");
+      const deckData = data;
+      if (deckData) {
+        const { data, error } = await addCards(newCardContents, deckData.id);
+        
+        if (data) {
+          results["deckId"] = deckData.id;
+          results["numOfData"] = data.length;
+        }
+
+        if(error) {
+          throw new Error("Failed to add cards!");
+        }
       }
-      
+
       res
-        .status(200)
+        .status(statusCode)
         .json({
-          deckId : deckResult.id,
-          deckName: deckResult.deck_name,
-          numOfCards: numOfData
+          results
         });
     } catch(err) {
+      statusCode = err.message.search("duplicate key value") === -1 ? 400 : 409;
+      err.message = err.message.search("duplicate key value") === -1 ? "Something went wrong." : "The title has been used. Try other title";
+      
       res
-        .status(409)
+        .status(statusCode)
         .json({
           error: err.message
         })
@@ -124,9 +140,8 @@ module.exports = ({
         );
     } catch(err) {
       // Status code need to be evaluate. Especially title confict
-      const statusCode = 400; 
       res
-        .status(statusCode)
+        .status(400)
         .json({
           error: err.message
         })
@@ -135,6 +150,10 @@ module.exports = ({
 
   router.post('/delete/:id', validateAccessToken, async (req, res) => {
     const deckId = req.params.id;
+    if (!deckId) {
+      throw new Error("deck id is missing!");
+    }
+
     try {
       const results = await Promise.all([deleteDeck(deckId), deleteCardsByDeckId(deckId)]);
 
