@@ -6,9 +6,6 @@ const {
 } = require('./dataHelpers');
 
 query_strings = {
-  "GET_CARDS": {
-    text: `SELECT * FROM cards`
-  },
   "GET_CARDS_BY_DECKID" : (id) => {
     return  {
       text: `SELECT * FROM cards WHERE deck_id = $1`,

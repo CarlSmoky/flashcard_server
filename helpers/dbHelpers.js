@@ -2,15 +2,6 @@ const { query_strings } = require('./queries');
 
 module.exports = (db) => {
   //Cards
-  const getCards = async () => {
-    try {
-      const query = query_strings.GET_CARDS;
-      const result = await db.query(query);
-      return result.rows;
-    } catch(error) {
-      console.error("Failed to get cards!", error);
-    }
-  };
 
   const getCardsByDeckID = async (id) => {
     try {
@@ -202,7 +193,6 @@ module.exports = (db) => {
   };
 
   return {
-    getCards,
     getCardsByDeckID,
     addCards,
     updateCards,
