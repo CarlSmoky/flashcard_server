@@ -110,6 +110,7 @@ module.exports = ({
         return functions;
       }
 
+      // pass error here like error: value too long for type character varying(255)
       const errorItem = getErrorOccuredFunctions(results);
       if(errorItem.length > 0) {
         // Need to add roleback
@@ -122,9 +123,10 @@ module.exports = ({
           results
         );
     } catch(err) {
+      // Status code need to be evaluate. Especially title confict
+      const statusCode = 400; 
       res
-      // Status code need to be evaluate.
-        .status(403)
+        .status(statusCode)
         .json({
           error: err.message
         })
