@@ -10,7 +10,7 @@ module.exports = ({
   addCards,
   updateCards,
   deleteCards,
-  deleteAllCardsByDeckId,
+  deleteCardsByDeckId,
   updateDeck,
   deleteDeck,
   getOwerOfDeckId
@@ -136,20 +136,38 @@ module.exports = ({
   router.post('/delete/:id', validateAccessToken, async (req, res) => {
     const deckId = req.params.id;
     try {
-      const results = await Promise.all([deleteDeck(deckId), deleteAllCardsByDeckId(deckId)]);
+      const results = await Promise.all([deleteDeck(deckId), deleteCardsByDeckId(deckId)]);
+
+      let success = {};
+      if (results[0].data && results[1].data) {
+        success["deletedDeckName"] = results[0].data.deck_name;
+        success["numOfDeletedcards"] = results[1].data.length;
+      }
       
+      let message = [];
+      if (results[0].error) {
+        message = [...message, "Failed to delete deck!"]
+      }
+      if (results[1].error) {
+        message = [...message, "Failed to delete cards!"]
+      }
+
+      if (results[0].error || results[1].error) {
+        throw new Error(`${[...message]}` );
+      }
+
       res
         .status(200)
         .json(
-          results
+          success
         );
     } catch(err) {
       console.log(err)
       
       res
-        .status(409)
+        .status(400)
         .json({
-        error: err.message
+          error: err.message
         })
     }
   });

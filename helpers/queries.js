@@ -27,7 +27,7 @@ queryStrings = {
   "DELETE_CARDS" : (ids) => {
     return {text:  `DELETE FROM cards WHERE id IN (${[...ids]}) returning *`}
   },
-  "DELETE_ALL_CARDS_BY_DECK_ID" : (id) => {
+  "DELETE_CARDS_BY_DECK_ID" : (id) => {
     return {
       text: `DELETE FROM cards WHERE deck_id = $1 returning *`,
       values: [id]
