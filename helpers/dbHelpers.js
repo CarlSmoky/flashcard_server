@@ -4,12 +4,22 @@ module.exports = (db) => {
   //Cards
 
   const getCardsByDeckID = async (id) => {
+    
     try {
       const query = queryStrings.GET_CARDS_BY_DECKID(id);
       const result = await db.query(query);
-      return result.rows;
+
+      return {
+        data : result.rows,
+        error: null
+      }
     } catch(error) {
       console.error("Failed to get cards by deck_id!", error);
+
+      return {
+        data: null,
+        error, 
+      };
     }
   };
 
@@ -112,9 +122,18 @@ module.exports = (db) => {
     try {
       const query = queryStrings.GET_DECK_BY_ID(id);
       const result = await db.query(query);
-      return result.rows[0];
+
+      return {
+        data : result.rows[0],
+        error: null
+      }
     } catch (error) {
       console.error("Failed to get deck_id!", error);
+
+      return {
+        data: null,
+        error, 
+      };
     }
   };
 

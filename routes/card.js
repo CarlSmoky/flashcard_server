@@ -9,20 +9,32 @@ module.exports = ({
   router.get('/deck/:id', async (req, res) => {
     const id = req.params.id;
     try {
-      const all = await Promise.all([getDeckById(id), getCardsByDeckID(id)]);
+      const results = await Promise.all([getDeckById(id), getCardsByDeckID(id)]);
 
-      const deck = all[0];
-      const cards = all[1];
-      const setOfCardsByDeck = {
-        deck,
-        cards
+      const deck = results[0].data;
+      const cards = results[1].data;
+
+      let message = [];
+      if (results[0].error) {
+        message = [...message, "Failed to get deck!"]
       }
+      if (results[1].error) {
+        message = [...message, "Failed to get cards!"]
+      }
+
+      if (results[0].error || results[1].error) {
+        throw new Error(`${[...message]}` );
+      }
+
       res
         .status(200)
-        .json(setOfCardsByDeck);
+        .json({
+          deck,
+          cards
+        });
     } catch (err) {
       res
-        .status(409)
+        .status(400)
         .json({
           error: err.message
         })
