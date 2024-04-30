@@ -25,15 +25,20 @@ module.exports = ({
     const { stats } = req.body;
     const userId = req.auth.payload.sub;
     try {
-      const numOfItem = await addStats(stats, userId);
+      const { data, error } = await addStats(stats, userId);
+      
+      if (error) {
+        throw new Error(`Failed to add stats! error: ${error}`);
+      }
+
       res
         .status(200)
         .json({
-          numOfItem
+          numOfItem: data.length
         });
     } catch (err) {
       res
-        .status(409)
+        .status(400)
         .json({
           error: err.message
         })

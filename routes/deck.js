@@ -17,18 +17,18 @@ module.exports = ({
 }) => {
 
   router.get('/', async (req, res) => {
-    
+
     try {
       const { data, error } = await getDecks();
 
       if (error) {
-        throw new Error(`Failed to get deck list.` );
+        throw new Error(`Failed to get deck list.`);
       }
 
       res
         .status(200)
         .json(data);
-    } catch(err) {
+    } catch (err) {
       res
         .status(400)
         .json({
@@ -41,11 +41,9 @@ module.exports = ({
     const { newDeckContents, newCardContents } = req.body;
     const userId = req.auth.payload.sub;
     try {
-
-      let statusCode = 200;
       const results = {};
       const { data, error } = await addDeck(newDeckContents.deckName, newDeckContents.description, userId);
-    
+
       if (error) {
         throw new Error(`Failed to create deck! error: ${error}`);
       }
@@ -53,26 +51,26 @@ module.exports = ({
       const deckData = data;
       if (deckData) {
         const { data, error } = await addCards(newCardContents, deckData.id);
-        
+
         if (data) {
           results["deckId"] = deckData.id;
           results["numOfData"] = data.length;
         }
 
-        if(error) {
+        if (error) {
           throw new Error("Failed to add cards!");
         }
       }
 
       res
-        .status(statusCode)
+        .status(200)
         .json({
           results
         });
-    } catch(err) {
-      statusCode = err.message.search("duplicate key value") === -1 ? 400 : 409;
+    } catch (err) {
+      const statusCode = err.message.search("duplicate key value") === -1 ? 400 : 409;
       err.message = err.message.search("duplicate key value") === -1 ? "Something went wrong." : "The title has been used. Try other title";
-      
+
       res
         .status(statusCode)
         .json({
@@ -85,21 +83,24 @@ module.exports = ({
     const deckId = req.params.id;
     const auth0UserId = req.auth.payload.sub;
     const { updateDeckData, createdCardsData, updateCardsData, deleteCardsData } = req.body;
-    
-    try {
-      const userId = await getOwerOfDeckId(deckId);
-      if (auth0UserId !== userId.user_id) {
-        throw new Error(`User doesn't match. Only deck owner can change their decks and cards.`);
-      }
 
-      let statusCode = 200;
-      const results = {}
+    const results = {}
+    let errorMessage = "";
+
+    try {
+      const { data, error } = await getOwerOfDeckId(deckId);
+
+      if (auth0UserId !== data.user_id || error) {
+        errorMessage = "User doesn't match. Only deck owner can change their decks and cards.";
+        throw new Error(errorMessage);
+      }
 
       if (updateDeckData !== null) {
         const { data, error } = await updateDeck(updateDeckData.id, updateDeckData.deckName, updateDeckData.description);
 
         if (error) {
-          throw new Error(`Failed to update deck! error: ${error}`);
+          errorMessage = `Failed to update deck! error: ${error}`;
+          throw new Error(errorMessage);
         }
 
         if (data) {
@@ -111,7 +112,8 @@ module.exports = ({
         const { data, error } = await updateCards(updateCardsData);
 
         if (error) {
-          throw new Error(`Failed to update cards! error: ${error}`);
+          errorMessage = `Failed to update cards! error: ${error}`
+          throw new Error(errorMessage);
         }
 
         if (data) {
@@ -123,7 +125,8 @@ module.exports = ({
         const { data, error } = await addCards(createdCardsData, deckId);
 
         if (error) {
-          throw new Error(`Failed to careate cards! error: ${error}`);
+          errorMessage = `Failed to careate cards! error: ${error}`
+          throw new Error(errorMessage);
         }
 
         if (data) {
@@ -134,7 +137,8 @@ module.exports = ({
       if (deleteCardsData.length !== 0) {
         const { data, error } = await deleteCards(deleteCardsData);
         if (error) {
-          throw new Error(`Failed to delete cards! error: ${error}`);
+          errorMessage = `Failed to delete cards! error: ${error}`
+          throw new Error(errorMessage);
         }
 
         if (data) {
@@ -143,20 +147,25 @@ module.exports = ({
       }
 
       res
-        .status(statusCode)
+        .status(200)
         .json(
           results
         );
-    } catch(err) {
-      // Status code need to be evaluate. Especially title confict
-        statusCode = err.message.search("duplicate key value") === -1 ? 400 : 409;
-        err.message = err.message.search("duplicate key value") === -1 ? err.message : "The title has been used. Try other title";
-        
-        res
-          .status(statusCode)
-          .json({
-            error: err.message
-          })
+    } catch (err) {
+      if (err.message.search("duplicate key value") >= 0) {
+        statusCode = 409
+      } else if (err.message.search("User doesn't match.") >= 0) {
+        statusCode = 403
+      } else {
+        statusCode = 400
+      }
+      err.message = err.message.search("duplicate key value") === -1 ? err.message : "The title has been used. Try other title";
+
+      res
+        .status(statusCode)
+        .json({
+          error: err.message
+        })
     }
   });
 
@@ -174,7 +183,7 @@ module.exports = ({
         results["deletedDeckName"] = promiseResult[0].data.deck_name;
         results["numOfDeletedcards"] = promiseResult[1].data.length;
       }
-      
+
       let message = [];
       if (promiseResult[0].error) {
         message = [...message, "Failed to delete deck!"]
@@ -184,7 +193,7 @@ module.exports = ({
       }
 
       if (promiseResult[0].error || promiseResult[1].error) {
-        throw new Error(`${[...message]}` );
+        throw new Error(`${[...message]}`);
       }
 
       res
@@ -192,9 +201,9 @@ module.exports = ({
         .json(
           results
         );
-    } catch(err) {
+    } catch (err) {
       console.log(err)
-      
+
       res
         .status(400)
         .json({
