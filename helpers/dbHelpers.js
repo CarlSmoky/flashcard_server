@@ -25,6 +25,7 @@ module.exports = (db) => {
 
   const addCards = async (newCardContents, deckId) => {
     const columns = ["deck_id", "term", "definition"];
+    
     try {
       const query = queryStrings.ADD_CARDS(columns, newCardContents, deckId);
       const result = await db.query(query);

@@ -92,59 +92,71 @@ module.exports = ({
         throw new Error(`User doesn't match. Only deck owner can change their decks and cards.`);
       }
 
-      let promiseArr = [];
-      let targetFunctions = [];
+      let statusCode = 200;
+      const results = {}
+
       if (updateDeckData !== null) {
-        promiseArr = [...promiseArr, updateDeck(updateDeckData.id, updateDeckData.deckName, updateDeckData.description)];
-        targetFunctions = [...targetFunctions, "updateDeck"];
+        const { data, error } = await updateDeck(updateDeckData.id, updateDeckData.deckName, updateDeckData.description);
+
+        if (error) {
+          throw new Error(`Failed to update deck! error: ${error}`);
+        }
+
+        if (data) {
+          results["updateDeckData"] = data;
+        }
       }
 
       if (updateCardsData.length !== 0) {
-        promiseArr = [...promiseArr, updateCards(updateCardsData)];
-        targetFunctions = [...targetFunctions, "updateCards"];
+        const { data, error } = await updateCards(updateCardsData);
+
+        if (error) {
+          throw new Error(`Failed to update cards! error: ${error}`);
+        }
+
+        if (data) {
+          results["updateCardsData"] = data;
+        }
       }
 
       if (createdCardsData.length !== 0) {
-        promiseArr = [...promiseArr, addCards(createdCardsData, deckId)];
-        targetFunctions = [...targetFunctions, "addCards"];
+        const { data, error } = await addCards(createdCardsData, deckId);
+
+        if (error) {
+          throw new Error(`Failed to careate cards! error: ${error}`);
+        }
+
+        if (data) {
+          results["createdCardsData"] = data;
+        }
       }
 
       if (deleteCardsData.length !== 0) {
-        promiseArr = [...promiseArr, deleteCards(deleteCardsData)];
-        targetFunctions = [...targetFunctions, "deleteCards"];
-      }
+        const { data, error } = await deleteCards(deleteCardsData);
+        if (error) {
+          throw new Error(`Failed to delete cards! error: ${error}`);
+        }
 
-      const results = await Promise.all(promiseArr);
-
-      const getErrorOccuredFunctions = results => {
-        let functions = [];
-        results.forEach(({data, error}, i) => {
-          if (!!error) {
-            functions = [...functions, targetFunctions[i]];
-          }
-        })
-        return functions;
-      }
-
-      // pass error here like error: value too long for type character varying(255)
-      const errorItem = getErrorOccuredFunctions(results);
-      if(errorItem.length > 0) {
-        // Need to add roleback
-        throw new Error(`Error occurs in: ${[...errorItem]}` );
+        if (data) {
+          results["deleteCardsData"] = data;
+        }
       }
 
       res
-        .status(200)
+        .status(statusCode)
         .json(
           results
         );
     } catch(err) {
       // Status code need to be evaluate. Especially title confict
-      res
-        .status(400)
-        .json({
-          error: err.message
-        })
+        statusCode = err.message.search("duplicate key value") === -1 ? 400 : 409;
+        err.message = err.message.search("duplicate key value") === -1 ? err.message : "The title has been used. Try other title";
+        
+        res
+          .status(statusCode)
+          .json({
+            error: err.message
+          })
     }
   });
 
@@ -155,30 +167,30 @@ module.exports = ({
     }
 
     try {
-      const results = await Promise.all([deleteDeck(deckId), deleteCardsByDeckId(deckId)]);
+      const promiseResult = await Promise.all([deleteDeck(deckId), deleteCardsByDeckId(deckId)]);
 
-      let success = {};
-      if (results[0].data && results[1].data) {
-        success["deletedDeckName"] = results[0].data.deck_name;
-        success["numOfDeletedcards"] = results[1].data.length;
+      let results = {};
+      if (promiseResult[0].data && promiseResult[1].data) {
+        results["deletedDeckName"] = promiseResult[0].data.deck_name;
+        results["numOfDeletedcards"] = promiseResult[1].data.length;
       }
       
       let message = [];
-      if (results[0].error) {
+      if (promiseResult[0].error) {
         message = [...message, "Failed to delete deck!"]
       }
-      if (results[1].error) {
+      if (promiseResult[1].error) {
         message = [...message, "Failed to delete cards!"]
       }
 
-      if (results[0].error || results[1].error) {
+      if (promiseResult[0].error || promiseResult[1].error) {
         throw new Error(`${[...message]}` );
       }
 
       res
         .status(200)
         .json(
-          success
+          results
         );
     } catch(err) {
       console.log(err)
