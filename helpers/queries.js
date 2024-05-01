@@ -5,10 +5,7 @@ const {
   getUpdateCardsValues
 } = require('./dataHelpers');
 
-query_strings = {
-  "GET_CARDS": {
-    text: `SELECT * FROM cards`
-  },
+queryStrings = {
   "GET_CARDS_BY_DECKID" : (id) => {
     return  {
       text: `SELECT * FROM cards WHERE deck_id = $1`,
@@ -30,7 +27,7 @@ query_strings = {
   "DELETE_CARDS" : (ids) => {
     return {text:  `DELETE FROM cards WHERE id IN (${[...ids]}) returning *`}
   },
-  "DELETE_ALL_CARDS_BY_DECK_ID" : (id) => {
+  "DELETE_CARDS_BY_DECK_ID" : (id) => {
     return {
       text: `DELETE FROM cards WHERE deck_id = $1 returning *`,
       values: [id]
@@ -80,5 +77,5 @@ query_strings = {
   }
 }
 module.exports = {
-  query_strings
+  queryStrings
 }
