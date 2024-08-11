@@ -77,4 +77,5 @@ typings/
 .DS_Store
 .dockerignore
 fly.toml
-
+Dockerfile
+fly-deploy.yml
