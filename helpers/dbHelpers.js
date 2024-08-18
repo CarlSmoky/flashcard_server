@@ -23,6 +23,26 @@ module.exports = (db) => {
     }
   };
 
+  const getOrderedCardsByDeckID = async (id, userId) => {
+    console.log("function getOrderedCardsByDeckID called, id: ", id)
+    try {
+      const query = queryStrings.GET_ORDERED_CARDS_BY_DECKID(id, userId);
+      const result = await db.query(query);
+
+      return {
+        data: result.rows,
+        error: null
+      }
+    } catch (error) {
+      console.error("Failed to get cards by deck_id!", error);
+
+      return {
+        data: null,
+        error,
+      };
+    }
+  };
+
   const addCards = async (newCardContents, deckId) => {
     const columns = ["deck_id", "term", "definition"];
 
@@ -278,6 +298,7 @@ module.exports = (db) => {
 
   return {
     getCardsByDeckID,
+    getOrderedCardsByDeckID,
     addCards,
     updateCards,
     deleteCards,
