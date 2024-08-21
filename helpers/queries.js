@@ -12,6 +12,12 @@ queryStrings = {
       values: [id]
     }
   },
+  "GET_ORDERED_CARDS_BY_DECKID" : (id, userId) => {
+    return  {
+      text: `SELECT cards.id, deck_id, term, definition, created_at, cards.updated_at, S.star, COALESCE(S.learning, true) as learning, S.updated_at as latest_result_updated_at from cards LEFT JOIN (SELECT id, card_id, learning, star, updated_at, user_id from stats WHERE id in (SELECT MAX(id) FROM stats WHERE user_id = $1 GROUP BY card_id) ORDER BY card_id) AS S ON cards.id = S.card_id WHERE deck_id = $2 ORDER BY S.star DESC NULLS LAST, S.learning DESC, S.updated_at, cards.updated_at DESC;`,
+      values: [userId, id]
+    }
+  },
   "ADD_CARDS" : (columns, data, deckId) => {
     return {
       text: `INSERT INTO cards (${[...columns]}) VALUES${generateParams(data, columns)} returning *`,
