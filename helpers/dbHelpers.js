@@ -24,7 +24,6 @@ module.exports = (db) => {
   };
 
   const getOrderedCardsByDeckID = async (id, userId) => {
-    console.log("function getOrderedCardsByDeckID called, id: ", id)
     try {
       const query = queryStrings.GET_ORDERED_CARDS_BY_DECKID(id, userId);
       const result = await db.query(query);

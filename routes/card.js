@@ -52,6 +52,9 @@ module.exports = ({
     if (!id) {
       throw new Error("deck id is missing!");
     }
+    if (!userId) {
+      throw new Error("user id is missing!");
+    }
 
     try {
       const results = await Promise.all([getDeckById(id), getOrderedCardsByDeckID(id, userId)]);
