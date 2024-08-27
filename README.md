@@ -1,4 +1,4 @@
-# Dokodemo Card
+# Dokodemo Card Server
 This is a server for the 'Dokodemo Card' app, built with Express/Postgres/Node store for deck, card, and result of quiz
 
 - Please click here for the website: [Live Demo: Dokodemo Card](https://dokodemocard.vercel.app/)
